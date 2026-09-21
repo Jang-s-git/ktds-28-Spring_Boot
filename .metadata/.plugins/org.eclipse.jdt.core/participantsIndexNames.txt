@@ -1,0 +1,7 @@
+INDEX VERSION 1.134
+C:\Users\User\Documents\workspace-spring-tools-for-eclipse-5.4.0.RELEASE\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\4111796295.index
+\hello-string\src\main\java
+C:\Users\User\Documents\workspace-spring-tools-for-eclipse-5.4.0.RELEASE\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\3195915820.index
+\hello-boot\src\main\java
+C:\Users\User\Documents\workspace-spring-tools-for-eclipse-5.4.0.RELEASE\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\497074692.index
+\hello-string\src\main\java

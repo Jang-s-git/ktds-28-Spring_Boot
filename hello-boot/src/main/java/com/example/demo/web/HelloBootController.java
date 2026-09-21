@@ -1,0 +1,28 @@
+package com.example.demo.web;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+public class HelloBootController {
+	
+	public HelloBootController() {
+		System.out.println("스프링이 생성자를 호출했습니다.");
+	}
+	
+	@GetMapping("/hello")
+	public ResponseEntity<String> hello() {
+		return new ResponseEntity<>("Hello Boot Controller", HttpStatus.OK);
+	}
+
+	@GetMapping("/me")
+	public String view(Model model) {
+		model.addAttribute("name", "장규나");
+		model.addAttribute("job", "학생");
+		model.addAttribute("age", 23);
+		return "introduce";
+	}
+	
+}

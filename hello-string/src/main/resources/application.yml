@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: hello-string
+# JSP의 위치 지정 (ViewResolver 설정)
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+
+
+logging:
+  level:
+    root: debug

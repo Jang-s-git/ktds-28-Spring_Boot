@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: hello-string
+
+test:
+  name:
+    templete: 1234

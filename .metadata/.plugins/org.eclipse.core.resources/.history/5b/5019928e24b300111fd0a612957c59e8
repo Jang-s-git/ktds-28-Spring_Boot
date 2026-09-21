@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: hello-string
+
+#logging:
+#  level:
+#    root: debug
