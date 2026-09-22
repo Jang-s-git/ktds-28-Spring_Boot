@@ -1,5 +1,18 @@
 package com.ktdsuniversity.edu.articles.vo.response;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+//@Getter // 멤버변수들의 Getter를 자동 생성
+//@Setter // 멤버변수들의 Setter를 자동 생성
+//@ToString // toString 메소드를 자동 생성
+@AllArgsConstructor // 모든 멤버변수들을 파라미터로 가지는 생성자를 자동생성
+@NoArgsConstructor // 기본 생성자를 자동 생성
+@Data // @Getter, @Setter, @ToString 한 번에 만들어줌
 public class ArticlesVO {
 	
 	private String id;
@@ -11,67 +24,6 @@ public class ArticlesVO {
 	private String delYn;
 	private String crtDt;
 	private String mdfyDt;
-	private String fileSetId;
-	
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
-	public String getSubject() {
-		return subject;
-	}
-	public void setSubject(String subject) {
-		this.subject = subject;
-	}
-	public String getContent() {
-		return content;
-	}
-	public void setContent(String content) {
-		this.content = content;
-	}
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	public long getViewCnt() {
-		return viewCnt;
-	}
-	public void setViewCnt(long viewCnt) {
-		this.viewCnt = viewCnt;
-	}
-	public long getRecommendCnt() {
-		return recommendCnt;
-	}
-	public void setRecommendCnt(long recommendCnt) {
-		this.recommendCnt = recommendCnt;
-	}
-	public String getDelYn() {
-		return delYn;
-	}
-	public void setDelYn(String delYn) {
-		this.delYn = delYn;
-	}
-	public String getCrtDt() {
-		return crtDt;
-	}
-	public void setCrtDt(String crtDt) {
-		this.crtDt = crtDt;
-	}
-	public String getMdfyDt() {
-		return mdfyDt;
-	}
-	public void setMdfyDt(String mdfyDt) {
-		this.mdfyDt = mdfyDt;
-	}
-	public String getFileSetId() {
-		return fileSetId;
-	}
-	public void setFileSetId(String fileSetId) {
-		this.fileSetId = fileSetId;
-	}
+	private String fileSetId; 
 	
 }

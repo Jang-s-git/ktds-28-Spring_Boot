@@ -22,6 +22,7 @@
 	<select id="selectArticlesCount" resultType="_long">
 		SELECT COUNT(ID)
 		  FROM ARTICLES
+		 WHERE DEL_YN = 'N'
 	</select>
 	
 	<select id="selectAllArticles"
@@ -37,6 +38,85 @@
 	     , TO_CHAR(MDFY_DT, 'YYYY-MM-DD HH24:MI:SS') AS MDFY_DT
 	     , FILE_SET_ID
 	  FROM ARTICLES
+	 WHERE DEL_YN = 'N'
 	</select>
+	
+	<!-- resultType은 select 태그에만 작성 가능 -->
+	<insert id="insertNewArticle"
+			parameterType="com.ktdsuniversity.edu.articles.vo.request.RegistArticleVO">
+		
+		<selectKey order="BEFORE" keyProperty="id" resultType="string">
+			SELECT 'AR-' || TO_CHAR(SYSDATE, 'YYYYMMDD-') || LPAD(SEQ_ARTICLES_PK.NEXTVAL, 6, '0')
+			  FROM DUAL
+		</selectKey>
+		
+		INSERT INTO ARTICLES
+		 (ID
+		, SUBJECT
+		, CONTENT
+		, EMAIL
+		, CRT_DT
+		, FILE_SET_ID)
+		VALUES
+		 (#{id}
+		, #{subject}
+		, #{content}
+		, #{email}
+		, SYSDATE
+		, NULL)
+	</insert>
+	
+	<select id="selectArticleByArticleId"
+			parameterType="string"
+			resultType="com.ktdsuniversity.edu.articles.vo.response.ArticlesVO">
+		SELECT ID
+	     , SUBJECT
+	     , CONTENT
+	     , EMAIL
+	     , VIEW_CNT
+	     , RECOMMEND_CNT
+	     , DEL_YN
+	     , TO_CHAR(CRT_DT, 'YYYY-MM-DD HH24:MI:SS') AS CRT_DT
+	     , TO_CHAR(MDFY_DT, 'YYYY-MM-DD HH24:MI:SS') AS MDFY_DT
+	     , FILE_SET_ID
+	  FROM ARTICLES
+	 WHERE ID = #{_parameter}
+	   AND DEL_YN = 'N'
+	</select>
+	
+	<update id="updateArticle">
+		UPDATE ARTICLES
+		   SET SUBJECT = #{modifyArticleVO.subject}
+		   	 , CONTENT = #{modifyArticleVO.content}
+		   	 , MDFY_DT = SYSDATE
+		 WHERE ID = #{articleId}
+		   AND EMAIL = #{modifyArticleVO.email}
+		   AND DEL_YN = 'N'
+	</update>
+	
+	<update id="deleteArticle"
+			parameterType="string">
+		UPDATE ARTICLES
+		   SET DEL_YN = 'Y'
+		   	 , MDFY_DT = SYSDATE
+		 WHERE ID = #{_parameter}
+		   AND DEL_YN = 'N'
+	</update>
+	
+	<update id="updateIncreaseViewCount"
+			parameterType="string">
+		UPDATE ARTICLES
+		   SET VIEW_CNT = VIEW_CNT + 1
+		 WHERE ID = #{_parameter}
+		   AND DEL_YN = 'N'
+	</update>
+	
+	<update id="updateIncreaseRecommendCount"
+			parameterType="string">
+		UPDATE ARTICLES
+		   SET RECOMMEND_CNT = RECOMMEND_CNT + 1
+		 WHERE ID = #{_parameter}
+		   AND DEL_YN = 'N'
+	</update>
 	
 </mapper>

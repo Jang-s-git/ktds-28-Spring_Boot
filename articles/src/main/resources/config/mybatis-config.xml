@@ -7,6 +7,9 @@
 	   https://mybatis.org/mybatis-3/ko/configuration.html#settings
 	 -->
 	 <settings>
+	 	<!-- Screaming Snake Case를 Camel Case로 변경해주는 세팅 -->
 	 	<setting name="mapUnderscoreToCamelCase" value="true" />
+	 	<!-- [DB - NULL] = [Java - NULL] -->
+	 	<setting name="jdbcTypeForNull" value="NULL" />
 	 </settings>
 </configuration>

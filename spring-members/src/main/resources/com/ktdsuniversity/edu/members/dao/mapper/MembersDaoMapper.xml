@@ -28,5 +28,4 @@
 	     , DEL_YN
 	  FROM MEMBERS
 	</select>
-	
 </mapper>
