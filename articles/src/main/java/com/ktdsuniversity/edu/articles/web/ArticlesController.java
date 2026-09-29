@@ -1,5 +1,7 @@
 package com.ktdsuniversity.edu.articles.web;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +14,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ktdsuniversity.edu.articles.service.ArticlesService;
 import com.ktdsuniversity.edu.articles.vo.request.ModifyArticleVO;
@@ -61,7 +65,14 @@ public class ArticlesController {
 	
 	@PostMapping("/articles")
 	@ResponseBody
-	public ApiResponse<ArticlesVO> makeNewArticles(@RequestBody RegistArticleVO registArticleVO) {
+	public ApiResponse<ArticlesVO> makeNewArticles(
+			// Command Object
+			// 클라이언트가 컨트롤러로 전송한 파라미터(폼파라미터 or 쿼리스트링파라미터)를 자동으로 받아오는 역할
+			RegistArticleVO registArticleVO
+			// 클라이언트가 컨트롤러로 전송한 파라미터(폼파라미터 or 쿼리스트링파라미터)를 하나씩 받아오는 역할
+//			@RequestParam List<MultipartFile> file
+			) {
+		
 		try {
 			ArticlesVO result = this.articlesService.createNewArticle(registArticleVO);
 			return ApiResponse.OK(result);

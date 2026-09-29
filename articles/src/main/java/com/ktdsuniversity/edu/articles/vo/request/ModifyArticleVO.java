@@ -9,4 +9,6 @@ public class ModifyArticleVO {
 	private String content;
 	private String email;
 	
+	private String fileSetId;
+	
 }
