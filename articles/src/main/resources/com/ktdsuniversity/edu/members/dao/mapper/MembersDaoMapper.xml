@@ -61,5 +61,58 @@
            AND DEL_YN = 'N'
     </select>
     
+    <update id="updateLoginStatus"
+            parameterType="string">
+        UPDATE MEMBERS
+		   SET LATEST_LOGIN_SUCCESS_DATE = SYSDATE
+		     , LOGIN_FAIL_COUNT = 0
+		     , LOGIN_BLOCK_YN = 'N'
+		     , LOGIN_BLOCK_DATE = NULL
+		     , LOGIN_YN = 'Y'
+		 WHERE EMAIL = #{_parameter}
+    </update>
+    
+    <update id="updateLoginFailed"
+            parameterType="string">
+        UPDATE MEMBERS
+		   SET LOGIN_FAIL_COUNT = LOGIN_FAIL_COUNT + 1
+		     , LATEST_LOGIN_FAIL_DATE = SYSDATE
+		 WHERE EMAIL = #{_parameter}
+    </update>
+    
+    <update id="updateBlock"
+            parameterType="string">
+        UPDATE MEMBERS
+		   SET LOGIN_BLOCK_YN = 'Y'
+		     , LOGIN_BLOCK_DATE = SYSDATE 
+		 WHERE EMAIL = #{_parameter}
+		   AND LOGIN_FAIL_COUNT >= 5
+    </update>
+    
+    <update id="updateResetBlock"
+            parameterType="string">
+        UPDATE MEMBERS
+           SET LOGIN_BLOCK_YN = 'N'
+             , LOGIN_BLOCK_DATE = NULL
+             , LOGIN_FAIL_COUNT = 0
+         WHERE EMAIL = #{_parameter}
+    </update>
+    
+    <update id="updateLogoutStatus"
+            parameterType="string">
+        UPDATE MEMBERS
+           SET LATEST_LOGOUT_DATE = SYSDATE
+             , LOGIN_YN = 'N'
+         WHERE EMAIL = #{_parameter}
+    </update>
+    
+    <update id="deleteMember"
+            parameterType="string">
+        UPDATE MEMBERS
+		   SET PASSWORD = 'EXPIRED_USER'
+		     , SALT = 'EXPIRED_SALT'
+		     , DEL_YN = 'Y'
+		 WHERE EMAIL = #{_parameter}
+    </update>
 </mapper>
 

@@ -1,11 +1,15 @@
 package com.ktdsuniversity.edu.members.service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.ktdsuniversity.edu.commons.crypto.AES;
 import com.ktdsuniversity.edu.commons.crypto.encrypt.hash.SHA;
 import com.ktdsuniversity.edu.members.dao.MembersDao;
+import com.ktdsuniversity.edu.members.vo.request.LoginMemberVO;
 import com.ktdsuniversity.edu.members.vo.request.RegistMembersVO;
 import com.ktdsuniversity.edu.members.vo.response.MembersVO;
 
@@ -59,6 +63,87 @@ public class MembersServiceImpl implements MembersService {
 		newMember.setName( AES.decode(this.aesSecretKey, newMember.getName()) );
 		newMember.setNickname( AES.decode(this.aesSecretKey, newMember.getNickname()) );
 		return newMember;
+	}
+
+	@Override
+	public MembersVO readMember(LoginMemberVO loginMemberVO) {
+		MembersVO membersVO = this.membersDao.selectMemberByEmail(loginMemberVO.getEmail());
+		
+		if (membersVO == null) {
+			throw new IllegalArgumentException("이메일 또는 비밀번호가 일치하지 않습니다.");
+		}
+		
+		if (membersVO.getLoginBlockYn().equals("Y")) {
+			// 차단된 계정
+			
+			// 차단된 후 1시간이 지났는가?
+			LocalDateTime now = LocalDateTime.now();
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			LocalDateTime loginBlockDate = LocalDateTime.parse(
+															membersVO.getLoginBlockDate(),
+															formatter);
+			loginBlockDate = loginBlockDate.plusHours(1);
+			
+			if (now.equals(loginBlockDate) || now.isAfter(loginBlockDate)) {
+				// 차단 후 1시간 경과
+				// 로그인 실패횟수 0으로 초기화 & 차단 여부 N으로 수정
+				int updateRows = this.membersDao.updateResetBlock(membersVO.getEmail());
+				System.out.println(updateRows +"건이 차단 해체되었습니다.");
+			} else {
+				throw new IllegalArgumentException("이메일 또는 비밀번호가 일치하지 않습니다.");
+			}
+		}
+		
+		// 활성화된 계정
+		// 사용자 salt 필요
+		// 로그인 요청 비밀번호 필요
+		// 암호화
+		String rawPassword = loginMemberVO.getPassword();
+		String storedSalt = membersVO.getSalt();
+		String encryptedPassword = SHA.getEncrypt(rawPassword, storedSalt);
+		
+		if (encryptedPassword.equals(membersVO.getPassword())) {
+			// 비밀번호 일치함
+			int updateRows = this.membersDao.updateLoginStatus(membersVO.getEmail());
+			if (updateRows == 0) {
+				throw new IllegalArgumentException("로그인을 실패했습니다. 잠시 후 다시 시도해주세요.");
+			}
+			MembersVO loggedMember = this.membersDao.selectMemberByEmail(membersVO.getEmail());
+			loggedMember.setName(AES.decode(this.aesSecretKey, loggedMember.getName()));
+			loggedMember.setNickname(AES.decode(this.aesSecretKey, loggedMember.getNickname()));
+			return loggedMember;
+		}
+		
+		// 비밀번호 불일치
+		int updateRows = this.membersDao.updateLoginFailed(membersVO.getEmail());
+		System.out.println(updateRows + " 로그인 실패!");
+		
+		int blockUpdateRows = this.membersDao.updateBlock(membersVO.getEmail());
+		if (blockUpdateRows > 0) {
+			// 계정이 차단됨
+			throw new IllegalArgumentException("로그인 실패 횟수가 누적되어 계정이 차단되었습니다. 1시간 후 재시도 해주세요.");
+		} else {
+			throw new IllegalArgumentException("이메일 또는 비밀번호가 일치하지 않습니다.");
+		}
+	}
+
+	@Override
+	public String updateLogoutStatus(String email) {
+		int updateRows = this.membersDao.updateLogoutStatus(email);
+		if (updateRows > 0) {
+			return email;
+		}
+		return null;
+	}
+
+	@Override
+	public String deleteMember(String email, String password) {
+		
+		int deleteRows = this.membersDao.deleteMember(email);
+		if (deleteRows > 0) {
+			return email;
+		}
+		return null;
 	}
 	
 }

@@ -22,8 +22,6 @@ public class RegistArticleVO {
 	
 	private String content;
 	
-	@NotBlank(message="이메일을 입력해주세요.")
-	@Email(message="올바른 이메일을 입력해주세요.")
 	private String email;
 	
 	private List<MultipartFile> file;

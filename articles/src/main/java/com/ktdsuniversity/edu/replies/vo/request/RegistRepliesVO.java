@@ -13,8 +13,6 @@ public class RegistRepliesVO {
 
 	private String id;
 	
-	@NotEmpty(message="이메일은 필수 입력값입니다.")
-	@Email(message="올바른 이메일을 입력해주세요.")
 	private String email;
 	
 	private String content;

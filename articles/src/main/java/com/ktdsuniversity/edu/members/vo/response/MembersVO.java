@@ -11,6 +11,8 @@ public class MembersVO {
 	private String name;
 	private String nickname;
 	
+	// 조회 시 이것만 제외하고 호출
+	// 사용자 정보를 조회할 때 민감 정보를 보여주지 않기 위함
 	@JsonIgnore
 	private String password;
 	
