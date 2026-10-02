@@ -12,8 +12,8 @@ import lombok.ToString;
 //@Getter // 멤버변수들의 Getter를 자동 생성
 //@Setter // 멤버변수들의 Setter를 자동 생성
 //@ToString // toString 메소드를 자동 생성
-@AllArgsConstructor // 모든 멤버변수들을 파라미터로 가지는 생성자를 자동생성
-@NoArgsConstructor // 기본 생성자를 자동 생성
+//@AllArgsConstructor // 모든 멤버변수들을 파라미터로 가지는 생성자를 자동생성
+//@NoArgsConstructor // 기본 생성자를 자동 생성
 @Data // @Getter, @Setter, @ToString 한 번에 만들어줌
 public class ArticlesVO {
 	

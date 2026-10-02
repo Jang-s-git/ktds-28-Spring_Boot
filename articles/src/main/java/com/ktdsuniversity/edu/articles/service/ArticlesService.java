@@ -8,8 +8,8 @@ import com.ktdsuniversity.edu.articles.vo.response.ArticlesVO;
 public interface ArticlesService {
 
 	/**
-	 * 게시글의 목록 조회
-	 * @return (개시글 수, 게시글 목록)
+	 * 게시글의 목록을 조회.
+	 * @return (게시글 개수, 게시글 목록)
 	 */
 	ArticleListVO readAllArticles();
 	
@@ -30,17 +30,17 @@ public interface ArticlesService {
 	/**
 	 * 게시글 삭제
 	 * @param articleId 삭제하려는 게시글의 아이디
-	 * @return 수정된 결과
+	 * @return 삭제한 게시글의 아이디
 	 */
 	String deleteArticle(String articleId);
-	
+
 	/**
 	 * 게시글 조회
 	 * @param articleId 조회하려는 게시글의 아이디
 	 * @return 수정된 결과 (조회수 +1)
 	 */
-	ArticlesVO getOneArticle(String articleId);
-	
+	ArticlesVO readOneArticle(String articleId);
+
 	/**
 	 * 게시글 추천
 	 * @param articleId 추천하려는 게시글의 아이디

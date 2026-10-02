@@ -16,3 +16,12 @@ spring:
 mybatis:
   config-location: classpath:config/mybatis-config.xml
   mapper-locations: classpath:com/ktdsuniversity/edu/**/dao/mapper/*DaoMapper.xml
+
+# Custom 환경 설정
+# 사용하려는 Spring Bean에서 @Value로 사용 가능
+app:
+  multipart:
+    store-path: uploadFiles
+  encrypt:
+    aes:
+      key: abcde12345abcde12345abcde12345zz 
