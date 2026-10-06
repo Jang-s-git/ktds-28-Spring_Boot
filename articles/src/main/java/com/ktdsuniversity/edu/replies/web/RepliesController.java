@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.ktdsuniversity.edu.commons.util.ApiResponse;
 import com.ktdsuniversity.edu.members.vo.response.MembersVO;
@@ -29,7 +30,7 @@ public class RepliesController {
 	private RepliesService repliesService;
 	
 	// 게시글에 등록된 댓글을 반환
-	@GetMapping("/articles/{articleId}/replies")
+	@GetMapping("/articles/{articleId}/replies/list")
 	public ApiResponse<ReplyListVO> getReplies(@PathVariable String articleId) {
 		try {
 			return ApiResponse.OK(this.repliesService.readAllRepliesByArticleId(articleId));
@@ -43,17 +44,13 @@ public class RepliesController {
 	public ApiResponse<RepliesVO> makeNewReply(@PathVariable String articleId,
 			@Valid @ModelAttribute RegistRepliesVO registRepliesVO,
 			BindingResult validationResult,
-			HttpSession session
+			@SessionAttribute("__LOGIN_USER__") MembersVO membersVO
 	) {
 		if (validationResult.hasErrors()) {
 			return ApiResponse.BAD_REQUEST(validationResult.getFieldErrors());
 		}
 		
 		// HttpSession에 있는 __LOGIN_USER__에 있는 email을 꺼내서 registArticleVO에 할당
-		MembersVO membersVO = (MembersVO) session.getAttribute("__LOGIN_USER__");
-		if(membersVO == null) {
-			throw new IllegalArgumentException("로그인이 필요한 기능입니다.");
-		}
 		registRepliesVO.setEmail(membersVO.getEmail());
 		
 		try {
@@ -68,17 +65,13 @@ public class RepliesController {
 	public ApiResponse<RepliesVO> updateReply(@PathVariable String articleId, @PathVariable String replyId,
 			@Valid @ModelAttribute ModifyRepliesVO modifyRepliesVO,
 			BindingResult validationResult,
-			HttpSession session
+			@SessionAttribute("__LOGIN_USER__") MembersVO membersVO
 	) {
 		if (validationResult.hasErrors()) {
 			return ApiResponse.BAD_REQUEST(validationResult.getFieldErrors());
 		}
 		
 		// HttpSession에 있는 __LOGIN_USER__에 있는 email을 꺼내서 registArticleVO에 할당
-		MembersVO membersVO = (MembersVO) session.getAttribute("__LOGIN_USER__");
-		if(membersVO == null) {
-			throw new IllegalArgumentException("로그인이 필요한 기능입니다.");
-		}
 		modifyRepliesVO.setEmail(membersVO.getEmail());
 		
 		try {

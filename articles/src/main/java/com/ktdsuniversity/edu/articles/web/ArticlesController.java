@@ -1,5 +1,7 @@
 package com.ktdsuniversity.edu.articles.web;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.ktdsuniversity.edu.articles.service.ArticlesService;
 import com.ktdsuniversity.edu.articles.vo.request.ModifyArticleVO;
@@ -18,7 +21,6 @@ import com.ktdsuniversity.edu.articles.vo.response.ArticlesVO;
 import com.ktdsuniversity.edu.commons.util.ApiResponse;
 import com.ktdsuniversity.edu.members.vo.response.MembersVO;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -27,6 +29,8 @@ import lombok.AllArgsConstructor;
 @Controller
 public class ArticlesController {
 
+	private static final Logger logger = LoggerFactory.getLogger(ArticlesController.class);
+	
 //	/**
 //	 * @Autowired ==> BeanContainer에서 같은 타입의 객체가 있다면, 그것을 멤버변수에게 할당시켜라!
 //	 */
@@ -51,11 +55,10 @@ public class ArticlesController {
 //		this.articlesService = articlesService;
 //	}
 
-	@GetMapping("/articles")
+	@GetMapping("/articles/list")
 	// 컨트롤러가 반환 시키는 "객체"를 "JSON" 으로 변환시키는 View를 사용해라! ==> @ResponseBody
 	@ResponseBody
 	public ApiResponse<ArticleListVO> getArticles() {
-//		System.out.println(this.articlesService);
 		ArticleListVO result = this.articlesService.readAllArticles();
 		return ApiResponse.OK(result);
 	}
@@ -67,12 +70,12 @@ public class ArticlesController {
 			// 클라이언트가 컨트롤러로 전송한 파라미터(폼파라미터, 쿼리스트링파라미터)를 자동으로 받아오는 역할.
 			@Valid @ModelAttribute RegistArticleVO registArticleVO,
 			BindingResult validationResult,
-			HttpSession session
+			// HttpSession에 등록된 __LOGIN_USER__에 있는 MembersVO를 파라미터로 받아와라
+			@SessionAttribute("__LOGIN_USER__") MembersVO membersVO
 	// 클라이언트가 컨트롤러로 전송한 파라미터(폼파라미터, 쿼리스트링파라미터)를 하나씩 받아오는 역할.
 	// , @RequestParam List<MultipartFile> file
 	) {
-		
-		System.out.println(validationResult);
+		logger.debug(validationResult.toString());
 		
 		// Validation 검사를 통과하지 못했다면, 클라이언트에게 에러 메세지를 전달
 		if (validationResult.hasErrors()) {
@@ -80,10 +83,6 @@ public class ArticlesController {
 		}
 		
 		// HttpSession에 있는 __LOGIN_USER__에 있는 email을 꺼내서 registArticleVO에 할당
-		MembersVO membersVO = (MembersVO) session.getAttribute("__LOGIN_USER__");
-		if(membersVO == null) {
-			throw new IllegalArgumentException("로그인이 필요한 기능입니다.");
-		}
 		registArticleVO.setEmail(membersVO.getEmail());
 		
 		try {
@@ -99,17 +98,13 @@ public class ArticlesController {
 	public ApiResponse<ArticlesVO> updateArticle(@PathVariable String articleId,
 			@Valid @ModelAttribute ModifyArticleVO modifyArticleVO,
 			BindingResult validationResult,
-			HttpSession session
+			@SessionAttribute("__LOGIN_USER__") MembersVO membersVO
 	) {
 		if (validationResult.hasErrors()) {
 			return ApiResponse.BAD_REQUEST(validationResult.getFieldErrors());
 		}
 		
 		// HttpSession에 있는 __LOGIN_USER__에 있는 email을 꺼내서 registArticleVO에 할당
-		MembersVO membersVO = (MembersVO) session.getAttribute("__LOGIN_USER__");
-		if(membersVO == null) {
-			throw new IllegalArgumentException("로그인이 필요한 기능입니다.");
-		}
 		modifyArticleVO.setEmail(membersVO.getEmail());
 		
 		try {

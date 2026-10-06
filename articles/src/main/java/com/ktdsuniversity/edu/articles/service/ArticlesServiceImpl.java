@@ -2,6 +2,8 @@ package com.ktdsuniversity.edu.articles.service;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -11,6 +13,9 @@ import com.ktdsuniversity.edu.articles.vo.request.ModifyArticleVO;
 import com.ktdsuniversity.edu.articles.vo.request.RegistArticleVO;
 import com.ktdsuniversity.edu.articles.vo.response.ArticleListVO;
 import com.ktdsuniversity.edu.articles.vo.response.ArticlesVO;
+import com.ktdsuniversity.edu.commons.exceptions.ArticleException;
+import com.ktdsuniversity.edu.commons.exceptions.enums.ArticleCodes;
+import com.ktdsuniversity.edu.commons.exceptions.enums.ExceptionType;
 import com.ktdsuniversity.edu.files.components.MultipartHandler;
 import com.ktdsuniversity.edu.members.vo.response.MembersVO;
 
@@ -22,6 +27,8 @@ import lombok.AllArgsConstructor;
 @Service
 public class ArticlesServiceImpl implements ArticlesService {
 
+	private static final Logger logger = LoggerFactory.getLogger(ArticlesServiceImpl.class);
+	
 	private ArticlesDao articlesDao;
 	private MultipartHandler multipartHandler;
 	
@@ -39,6 +46,8 @@ public class ArticlesServiceImpl implements ArticlesService {
 	@Override
 	public ArticlesVO createNewArticle(RegistArticleVO registArticleVO) {
 		
+		logger.debug(registArticleVO.toString());
+		
 		String fileSetId = this.multipartHandler.storeFiles(
 									registArticleVO.getFile(), 
 									registArticleVO.getEmail());
@@ -48,14 +57,14 @@ public class ArticlesServiceImpl implements ArticlesService {
 		
 		// Insert한 게시글의 ID로 게시글 정보를 조회한다.
 		// -> Insert한 게시글의 ID가 뭔지 모른다.
-		
-		System.out.println(insertedRows + "개의 row가 생성되었습니다.");
+		logger.info("{}개의 row가 생성되었습니다.", insertedRows);
 		
 		if (insertedRows > 0) {
 			return this.articlesDao.selectArticleByArticleId( registArticleVO.getId() );
 		}
 		
-		throw new IllegalArgumentException("입력값이 유효하지 않습니다.");
+		// throw new IllegalArgumentException("입력값이 유효하지 않습니다.");
+		throw new ArticleException(ExceptionType.ARTICLES, ArticleCodes.BAD_REQUEST);
 	}
 	
 	@Override
@@ -101,7 +110,7 @@ public class ArticlesServiceImpl implements ArticlesService {
 		}
 		
 		int deleteCount = this.multipartHandler.deleteFiles(article.getFileSetId());
-		System.out.println(deleteCount + "개의 파일이 삭제되었습니다.");
+		logger.info("{}개의 파일이 삭제되었습니다.", deleteCount);
 		return articleId;
 	}
 	
