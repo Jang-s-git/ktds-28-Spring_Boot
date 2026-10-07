@@ -5,12 +5,14 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.ktdsuniversity.edu.articles.dao.ArticlesDao;
 import com.ktdsuniversity.edu.articles.vo.request.ModifyArticleVO;
 import com.ktdsuniversity.edu.articles.vo.request.RegistArticleVO;
+import com.ktdsuniversity.edu.articles.vo.request.SearchArticleVO;
 import com.ktdsuniversity.edu.articles.vo.response.ArticleListVO;
 import com.ktdsuniversity.edu.articles.vo.response.ArticlesVO;
 import com.ktdsuniversity.edu.commons.exceptions.ArticleException;
@@ -33,9 +35,11 @@ public class ArticlesServiceImpl implements ArticlesService {
 	private MultipartHandler multipartHandler;
 	
 	@Override
-	public ArticleListVO readAllArticles() {
-		long count = this.articlesDao.selectArticlesCount();
-		List<ArticlesVO> articleList = this.articlesDao.selectAllArticles();
+	public ArticleListVO readAllArticles(SearchArticleVO searchArticleVO) {
+		long count = this.articlesDao.selectArticlesCount(searchArticleVO);
+		searchArticleVO.calculatePageCount(count);
+		
+		List<ArticlesVO> articleList = this.articlesDao.selectAllArticles(searchArticleVO);
 		
 		ArticleListVO list = new ArticleListVO();
 		list.setArticleCount(count);
@@ -43,6 +47,7 @@ public class ArticlesServiceImpl implements ArticlesService {
 		return list;
 	}
 	
+	@Transactional
 	@Override
 	public ArticlesVO createNewArticle(RegistArticleVO registArticleVO) {
 		
@@ -67,6 +72,7 @@ public class ArticlesServiceImpl implements ArticlesService {
 		throw new ArticleException(ExceptionType.ARTICLES, ArticleCodes.BAD_REQUEST);
 	}
 	
+	@Transactional
 	@Override
 	public ArticlesVO updateArticle(String articleId, ModifyArticleVO modifyArticleVO) {
 		
@@ -81,12 +87,13 @@ public class ArticlesServiceImpl implements ArticlesService {
 		int updatedRows = this.articlesDao.updateArticle(articleId, modifyArticleVO);
 		
 		if (updatedRows == 0) {
-			throw new IllegalArgumentException("존재하지 않는 게시글입니다.");
+			throw new ArticleException(ExceptionType.ARTICLES, ArticleCodes.NOT_EXISTS);
 		}
 		
 		return this.articlesDao.selectArticleByArticleId(articleId);
 	}
 	
+	@Transactional
 	@Override
 	public String deleteArticle(String articleId) {
 		
@@ -101,12 +108,12 @@ public class ArticlesServiceImpl implements ArticlesService {
 		ArticlesVO article = this.articlesDao.selectArticleByArticleId(articleId);
 		
 		if (!loggedMember.getEmail().equals(article.getEmail())) {
-			throw new IllegalArgumentException("삭제할 수 없는 게시글입니다.");
+			throw new ArticleException(ExceptionType.ARTICLES, ArticleCodes.NOT_AUTHORIZED);
 		}
 		
 		int deletedRows = this.articlesDao.deleteArticle(articleId);
 		if (deletedRows == 0) {
-			throw new IllegalArgumentException("존재하지 않는 게시글입니다.");
+			throw new ArticleException(ExceptionType.ARTICLES, ArticleCodes.NOT_EXISTS);
 		}
 		
 		int deleteCount = this.multipartHandler.deleteFiles(article.getFileSetId());
@@ -114,23 +121,25 @@ public class ArticlesServiceImpl implements ArticlesService {
 		return articleId;
 	}
 	
+	@Transactional
 	@Override
 	public ArticlesVO readOneArticle(String articleId) {
 		int updatedRows = this.articlesDao.updateIncreaseViewCount(articleId);
 		
 		if (updatedRows == 0) {
-			throw new IllegalArgumentException("존재하지 않는 게시글입니다.");
+			throw new ArticleException(ExceptionType.ARTICLES, ArticleCodes.NOT_EXISTS);
 		}
 		
 		return this.articlesDao.selectArticleByArticleId(articleId);
 	}
 	
+	@Transactional
 	@Override
 	public long recommendOneArticle(String articleId) {
 		int updatedRows = this.articlesDao.updateIncreaseRecommendCount(articleId);
 		
 		if (updatedRows == 0) {
-			throw new IllegalArgumentException("존재하지 않는 게시글입니다.");
+			throw new ArticleException(ExceptionType.ARTICLES, ArticleCodes.NOT_EXISTS);
 		}
 		
 		ArticlesVO article = this.articlesDao.selectArticleByArticleId(articleId);

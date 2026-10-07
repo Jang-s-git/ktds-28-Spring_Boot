@@ -32,11 +32,7 @@ public class RepliesController {
 	// 게시글에 등록된 댓글을 반환
 	@GetMapping("/articles/{articleId}/replies/list")
 	public ApiResponse<ReplyListVO> getReplies(@PathVariable String articleId) {
-		try {
-			return ApiResponse.OK(this.repliesService.readAllRepliesByArticleId(articleId));
-		} catch (IllegalArgumentException iae) {
-			return ApiResponse.FORBIDDEN(iae.getMessage());
-		}
+		return ApiResponse.OK(this.repliesService.readAllRepliesByArticleId(articleId));
 	}
 	
 	// 게시글에 댓글 작성 (파일 첨부 가능)
@@ -53,11 +49,7 @@ public class RepliesController {
 		// HttpSession에 있는 __LOGIN_USER__에 있는 email을 꺼내서 registArticleVO에 할당
 		registRepliesVO.setEmail(membersVO.getEmail());
 		
-		try {
-			return ApiResponse.OK(this.repliesService.createNewReply(articleId, registRepliesVO));
-		} catch (IllegalArgumentException iae) {
-			return ApiResponse.FORBIDDEN(iae.getMessage());
-		}
+		return ApiResponse.OK(this.repliesService.createNewReply(articleId, registRepliesVO));
 	}
 	
 	// 게시글에 등록된 댓글을 수정 (파일 첨부 가능)
@@ -74,11 +66,7 @@ public class RepliesController {
 		// HttpSession에 있는 __LOGIN_USER__에 있는 email을 꺼내서 registArticleVO에 할당
 		modifyRepliesVO.setEmail(membersVO.getEmail());
 		
-		try {
-			return ApiResponse.OK(this.repliesService.updateReply(articleId, replyId, modifyRepliesVO));
-		} catch (IllegalArgumentException iae) {
-			return ApiResponse.FORBIDDEN(iae.getMessage());
-		}
+		return ApiResponse.OK(this.repliesService.updateReply(articleId, replyId, modifyRepliesVO));
 	}
 	
 	// 게시글에 등록된 댓글 하나를 삭제
@@ -90,21 +78,13 @@ public class RepliesController {
 			@Size(min=18, max=20, message="잘못된 값입니다.")
 			@PathVariable String replyId)
 	{
-		try {
-			return ApiResponse.OK(this.repliesService.deleteReply(articleId, replyId));
-		} catch (IllegalArgumentException iae) {
-			return ApiResponse.FORBIDDEN(iae.getMessage());
-		}
+		return ApiResponse.OK(this.repliesService.deleteReply(articleId, replyId));
 	}
 	
 	// 게시글에 등록된 댓글 하나를 추천
 	@PutMapping("/articles/{articleId}/replies/recommend/{replyId}")
 	public ApiResponse<Long> recommendOneReply(@PathVariable String articleId, @PathVariable String replyId) {
-		try {
-			return ApiResponse.OK(this.repliesService.recommendOneReply(articleId, replyId));
-		} catch (IllegalArgumentException iae) {
-			return ApiResponse.FORBIDDEN(iae.getMessage());
-		}
+		return ApiResponse.OK(this.repliesService.recommendOneReply(articleId, replyId));
 	}
 	
 }

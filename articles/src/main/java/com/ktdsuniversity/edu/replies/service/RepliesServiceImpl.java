@@ -3,9 +3,13 @@ package com.ktdsuniversity.edu.replies.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ktdsuniversity.edu.articles.dao.ArticlesDao;
 import com.ktdsuniversity.edu.articles.vo.response.ArticlesVO;
+import com.ktdsuniversity.edu.commons.exceptions.ArticleException;
+import com.ktdsuniversity.edu.commons.exceptions.enums.ArticleCodes;
+import com.ktdsuniversity.edu.commons.exceptions.enums.ExceptionType;
 import com.ktdsuniversity.edu.files.components.MultipartHandler;
 import com.ktdsuniversity.edu.replies.dao.RepliesDao;
 import com.ktdsuniversity.edu.replies.vo.request.ModifyRepliesVO;
@@ -30,7 +34,7 @@ public class RepliesServiceImpl implements RepliesService {
 		
 		ArticlesVO articles = this.articlesDao.selectArticleByArticleId(articleId);
 		if (articles == null) {
-			throw new IllegalArgumentException("존재하지 않는 게시글입니다.");
+			throw new ArticleException(ExceptionType.ARTICLES, ArticleCodes.NOT_EXISTS);
 		}
 		
 		ReplyListVO list = new ReplyListVO();
@@ -39,11 +43,12 @@ public class RepliesServiceImpl implements RepliesService {
 		return list;
 	}
 
+	@Transactional
 	@Override
 	public RepliesVO createNewReply(String articleId, RegistRepliesVO registRepliesVO) {
 		ArticlesVO articles = this.articlesDao.selectArticleByArticleId(articleId);
 		if (articles == null) {
-			throw new IllegalArgumentException("존재하지 않는 게시글입니다.");
+			throw new ArticleException(ExceptionType.ARTICLES, ArticleCodes.NOT_EXISTS);
 		}
 		
 		String fileSetId = this.multipartHandler.storeFiles(
@@ -55,22 +60,24 @@ public class RepliesServiceImpl implements RepliesService {
 		logger.info("{}개의 row가 생성되었습니다.", insertedRows);
 		
 		if (insertedRows == 0) {
-			throw new IllegalArgumentException("입력값이 유효하지 않습니다.");
+//			throw new IllegalArgumentException("입력값이 유효하지 않습니다.");
+			throw new ArticleException(ExceptionType.REPLIES, ArticleCodes.BAD_REQUEST);
 		}
 		
 		return this.repliesDao.selectReplyByReplyId(articleId, registRepliesVO.getId());
 	}
 
+	@Transactional
 	@Override
 	public RepliesVO updateReply(String articleId, String replyId, ModifyRepliesVO modifyRepliesVO) {
 		ArticlesVO articles = this.articlesDao.selectArticleByArticleId(articleId);
 		if (articles == null) {
-			throw new IllegalArgumentException("존재하지 않는 게시글입니다.");
+			throw new ArticleException(ExceptionType.ARTICLES, ArticleCodes.NOT_EXISTS);
 		}
 		
 		RepliesVO reply = this.repliesDao.selectReplyByReplyId(articleId, replyId);
 		if (reply == null) {
-			throw new IllegalArgumentException("존재하지 않는 댓글입니다.");
+			throw new ArticleException(ExceptionType.REPLIES, ArticleCodes.NOT_EXISTS);
 		}
 		
 		String fileSetId = this.multipartHandler.storeFiles(
@@ -81,24 +88,25 @@ public class RepliesServiceImpl implements RepliesService {
 		
 		int updatedRows = this.repliesDao.updateReply(articleId, replyId, modifyRepliesVO);
 		if (updatedRows == 0) {
-			throw new IllegalArgumentException("존재하지 않는 댓글입니다.");
+			throw new ArticleException(ExceptionType.REPLIES, ArticleCodes.NOT_EXISTS);
 		}
 		
 		return this.repliesDao.selectReplyByReplyId(articleId, replyId);
 	}
 
+	@Transactional
 	@Override
 	public String deleteReply(String articleId, String replyId) {
 		ArticlesVO articles = this.articlesDao.selectArticleByArticleId(articleId);
 		if (articles == null) {
-			throw new IllegalArgumentException("존재하지 않는 게시글입니다.");
+			throw new ArticleException(ExceptionType.ARTICLES, ArticleCodes.NOT_EXISTS);
 		}
 		
 		RepliesVO reply = this.repliesDao.selectReplyByReplyId(articleId, replyId);
 		
 		int deletedRows = this.repliesDao.deleteReplyByReplyId(articleId, replyId);
 		if (deletedRows == 0) {
-			throw new IllegalArgumentException("존재하지 않는 댓글입니다.");
+			throw new ArticleException(ExceptionType.REPLIES, ArticleCodes.NOT_EXISTS);
 		}
 		
 		int deleteCount = this.multipartHandler.deleteFiles(reply.getFileSetId());
@@ -106,17 +114,18 @@ public class RepliesServiceImpl implements RepliesService {
 		return replyId;
 	}
 
+	@Transactional
 	@Override
 	public long recommendOneReply(String articleId, String replyId) {
 		
 		ArticlesVO articles = this.articlesDao.selectArticleByArticleId(articleId);
 		if (articles == null) {
-			throw new IllegalArgumentException("존재하지 않는 게시글입니다.");
+			throw new ArticleException(ExceptionType.ARTICLES, ArticleCodes.NOT_EXISTS);
 		}
 		
 		int updatedRows = this.repliesDao.updateIncreaseRecommendCount(articleId, replyId);
 		if (updatedRows == 0) {
-			throw new IllegalArgumentException("존재하지 않는 댓글입니다.");
+			throw new ArticleException(ExceptionType.REPLIES, ArticleCodes.NOT_EXISTS);
 		}
 		
 		RepliesVO reply = this.repliesDao.selectReplyByReplyId(articleId, replyId);
