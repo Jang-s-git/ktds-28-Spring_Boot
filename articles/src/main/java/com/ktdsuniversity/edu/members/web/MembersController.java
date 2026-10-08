@@ -16,6 +16,8 @@ import com.ktdsuniversity.edu.commons.util.ApiResponse;
 import com.ktdsuniversity.edu.members.service.MembersService;
 import com.ktdsuniversity.edu.members.vo.request.LoginMemberVO;
 import com.ktdsuniversity.edu.members.vo.request.RegistMembersVO;
+import com.ktdsuniversity.edu.members.vo.request.SearchMemberVO;
+import com.ktdsuniversity.edu.members.vo.response.MemberListVO;
 import com.ktdsuniversity.edu.members.vo.response.MembersVO;
 
 import jakarta.servlet.http.HttpSession;
@@ -89,6 +91,16 @@ public class MembersController {
 		String email = this.membersService.deleteMember(membersVO.getEmail(), password);
 		
 		return ApiResponse.OK(email);
+	}
+	
+	@GetMapping("/members/list")
+	public ApiResponse<MemberListVO> getMembers(SearchMemberVO searchMemberVO) {
+		MemberListVO result = this.membersService.readAllMembers(searchMemberVO);
+		
+		ApiResponse<MemberListVO> response = ApiResponse.OK(result);
+		response.setPaginate(searchMemberVO);
+		
+		return response;
 	}
 	
 }
